@@ -1,21 +1,21 @@
 import numpy as np
 import random
 
-
-m_energia = np.zeros((10, 10))
 tam_poblacion = 2
-array_fitness = [0] * tam_poblacion
 rugosidad = 0.0024
 chances_crossover = 0.75
 chances_mutacion = 0.20
 filas = 10
 col = 10
-cte_long_estela = 18
+cte_long_estela = 12            #podemos jugar con este valor
 cant_molinos = 25
-array_poblacion = [0] * tam_poblacion
-velocidad_viento = 20
+viento_puro = 20
 viento = [0] * 10
-energia_total = 0
+
+
+array_fitness = [0] * tam_poblacion             #se guardan los totales de energia de todos los cromosomas
+array_poblacion = [0] * tam_poblacion           #se guardan todos los cromosomas
+array_energia_molino = [0] * tam_poblacion
 
 
 class Molino:
@@ -84,28 +84,38 @@ def retorna_energia(velocidad):
         return molinos.velocidad_potencia[0].potencia
 
 
-def calcula_velocidad_viento(velocidad_inicial):
+def calcula_velocidad_viento(velocidad_inicial, x):
     velocidad_final = velocidad_inicial * (1 - (2 * molinos.induccion_axial) / np.square(
-        1 + (molinos.arrastre * molinos.distancia_minima / molinos.radio_estela)))
+        1 + (molinos.arrastre * (molinos.distancia_minima * x) / molinos.radio_estela)))
     return velocidad_final
 
 
-def fitness(energia):
+def fitness(k):                     #pensar para 3 molinos consecutivos
+    viento_actual = viento_puro
+    energia = 0
+    m_energia = np.zeros((10, 10))
+    m = array_poblacion[k]
+    #def matriz de vientos que me arme un 10x10 con todos los valores del viento
     for i in range(0, filas):
         flag = True
         cont = 0
         for j in range(0, col):
             if m[i][j] == 1:
-                if flag or cte_long_estela * molinos.diametro < cont * molinos.distancia_minima:  # u0
+                if flag or cte_long_estela * molinos.diametro < cont * molinos.distancia_minima:    # entra si el viento es puro
                     flag = False
-                    energia = energia + retorna_energia(velocidad_viento)
-                else:  # ux
-                    velocidad_final = calcula_velocidad_viento(velocidad_viento)
-                    energia = energia + retorna_energia(velocidad_final)
+                    energia = energia + retorna_energia(viento_puro)
+                    m_energia[i][j] = retorna_energia(viento_puro)
+                else:                                                                               # entra si el viento es turbulento
+                        velocidad_final = calcula_velocidad_viento(viento_puro, cont)
+                        energia = energia + retorna_energia(velocidad_final)
+                        m_energia[i][j] = retorna_energia(velocidad_final)
                 cont = 1
+
             else:
                 if cont != 0:
                     cont += 1
+    array_energia_molino[k] = m_energia
+    array_fitness[k] = energia
 
 
 def poblacion_inicial():
@@ -128,6 +138,8 @@ def poblacion_inicial():
         if cros < chances_crossover:"""
 
 poblacion_inicial()
+for i in range(0, tam_poblacion):
+    fitness(i)
 for i in range(0, tam_poblacion):
     print(array_poblacion[i])
 
