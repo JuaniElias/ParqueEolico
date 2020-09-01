@@ -122,7 +122,7 @@ def poblacion_inicial():
     for k in range(0, tam_poblacion):
         m = np.zeros((10, 10))
         cont = 0
-        while cont < random.randint(1, cant_molinos):
+        while cont < 25:
             x = random.randint(0, 9)
             y = random.randint(0, 9)
             if m[x][y] == 0:
@@ -136,17 +136,29 @@ def crossover():
         cros = random.random()
 
         if cros < chances_crossover:
-            hijo1_molinos = np.concatenate((array_poblacion[i], array_poblacion[i+1]), axis=1)       #matriz 10x20 molinos
-            ex = hijo1_molinos
-            hijo1_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i+1]), axis=1)          #matriz 10x20 potencia
+
+                                                # CROSSOVER POR COLUMNAS
+            hijo1_molinos = np.concatenate((array_poblacion[i], array_poblacion[i+1]), axis=1)       #matriz 20x10 molinos
+            hijo1_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i+1]), axis=1)          #matriz 20x10 potencia
             sumatoria_h1 = hijo1_potencia.sum(axis=0)        #devuelve un arreglo con la sumatoria de todas las columnas
             permutacion = np.argsort(-sumatoria_h1)
 
-            idx = np.empty_like(permutacion)
-            idx[permutacion] = np.arange(len(permutacion))
-            hijo1_molinos[:, idx]
-            hijo1_molinos[:] = hijo1_molinos[:, idx]
+            hijo1 = np.zeros((10, 10))
+            for columna in range(0, 10):
+                for fila in range(0, 10):
+                    hijo1[fila][columna] = hijo1_molinos[fila][permutacion[columna]]
 
+
+                                                #CROSSOVER POR FILAS
+            hijo2_molinos = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=0)    # matriz 10x20 molinos
+            hijo2_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i + 1]), axis=0)  # matriz 10x20 potencia
+            sumatoria_h2 = hijo2_potencia.sum(axis=1)  # devuelve un arreglo con la sumatoria de todas las filas
+            permutacion = np.argsort(-sumatoria_h2)
+
+            hijo2 = np.zeros((10, 10))
+            for fila in range(0, 10):
+                for columna in range(0, 10):
+                    hijo2[fila][columna] = hijo2_molinos[permutacion[fila]][columna]
 
 
 
@@ -156,7 +168,8 @@ for i in range(0, tam_poblacion):
     fitness(i)
 crossover()
 for i in range(0, tam_poblacion):
-    print(array_poblacion[i])
+    #print(array_poblacion[i])
+    print(array_fitness[i])
 
 
 
