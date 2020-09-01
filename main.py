@@ -3,7 +3,7 @@ import random
 
 tam_poblacion = 2
 rugosidad = 0.0024
-chances_crossover = 0.75
+chances_crossover = 2
 chances_mutacion = 0.20
 filas = 10
 col = 10
@@ -15,7 +15,7 @@ viento = [0] * 10
 
 array_fitness = [0] * tam_poblacion             #se guardan los totales de energia de todos los cromosomas
 array_poblacion = [0] * tam_poblacion           #se guardan todos los cromosomas
-array_energia_molino = [0] * tam_poblacion
+array_energia_molino = [0] * tam_poblacion      #se guarda la energia producida por cada molino
 
 
 class Molino:
@@ -122,7 +122,7 @@ def poblacion_inicial():
     for k in range(0, tam_poblacion):
         m = np.zeros((10, 10))
         cont = 0
-        while cont < cant_molinos:
+        while cont < random.randint(1, cant_molinos):
             x = random.randint(0, 9)
             y = random.randint(0, 9)
             if m[x][y] == 0:
@@ -131,16 +131,32 @@ def poblacion_inicial():
         array_poblacion[k] = m
 
 
-"""def crossover():
+def crossover():
     for i in range(0, tam_poblacion, 2):
         cros = random.random()
 
-        if cros < chances_crossover:"""
+        if cros < chances_crossover:
+            hijo1_molinos = np.concatenate((array_poblacion[i], array_poblacion[i+1]), axis=1)       #matriz 10x20 molinos
+            ex = hijo1_molinos
+            hijo1_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i+1]), axis=1)          #matriz 10x20 potencia
+            sumatoria_h1 = hijo1_potencia.sum(axis=0)        #devuelve un arreglo con la sumatoria de todas las columnas
+            permutacion = np.argsort(-sumatoria_h1)
+
+            idx = np.empty_like(permutacion)
+            idx[permutacion] = np.arange(len(permutacion))
+            hijo1_molinos[:, idx]
+            hijo1_molinos[:] = hijo1_molinos[:, idx]
+
+
+
+
 
 poblacion_inicial()
 for i in range(0, tam_poblacion):
     fitness(i)
+crossover()
 for i in range(0, tam_poblacion):
     print(array_poblacion[i])
+
 
 
