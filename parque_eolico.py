@@ -89,10 +89,10 @@ def calcula_velocidad_viento(velocidad_inicial, x):
     return velocidad_final
 
 
-def calcula_energia_cromosoma(pob):  # Pensar para 3 molinos consecutivos
+def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
     energia = 0
     m_energia = np.zeros((filas, columnas))
-    m = array_poblacion[pob]
+    m = array_poblacion[ind_crom]
     # Def matriz de vientos que me arme un 10x10 con todos los valores del viento
     for i in range(filas):
         flag = True
@@ -115,8 +115,8 @@ def calcula_energia_cromosoma(pob):  # Pensar para 3 molinos consecutivos
                 if cont != 0:
                     cont += 1
 
-    array_energia_molino[k] = m_energia
-    array_energia_crom[k] = energia
+    array_energia_molino[ind_crom] = m_energia
+    array_energia_crom[ind_crom] = energia
 
 
 # def fitness():
@@ -139,11 +139,26 @@ def balance_molinos():
     for i in range(tam_poblacion):
         cromosoma = array_poblacion[i]
         cantidad_molinos = np.count_nonzero(cromosoma)
-        if cantidad_molinos > 25:
+
+        while cantidad_molinos > 25:
             calcula_energia_cromosoma(i)
 
-            for j in range(cantidad_molinos - 25):
+            energia_cromosoma = np.asarray(array_energia_molino[i])
 
+            arr_flat = energia_cromosoma.flatten()
+            min_value = np.min(arr_flat[np.nonzero(arr_flat)])
+
+            coord = np.where(energia_cromosoma == min_value)
+
+            coord = np.asarray(coord).transpose()
+
+            x = coord[0][0]
+            y = coord[0][1]
+
+            cromosoma[x][y] = 0
+            array_poblacion[i] = cromosoma
+
+            cantidad_molinos -= 1
 
 
 def crossover():
