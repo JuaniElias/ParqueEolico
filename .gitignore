@@ -36,9 +36,9 @@
 # .idea/compiler.xml
 # .idea/jarRepositories.xml
 # .idea/modules.xml
-# .idea/*.iml
+.idea/*.iml
 # .idea/modules
-# *.iml
+*.iml
 # *.ipr
 
 # CMake
@@ -82,8 +82,6 @@ fabric.properties
 
 .idea/misc.xml
 .idea/other.xml
-.iml
-
 
 # Sonarlint plugin
 # https://plugins.jetbrains.com/plugin/7973-sonarlint
