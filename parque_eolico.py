@@ -9,13 +9,13 @@ filas = 10
 columnas = 10
 cte_long_estela = 12  # Podemos jugar con este valor
 cant_molinos = 25
-viento_puro = 20
+viento_puro = 10
 viento = [0] * 10
 
-array_energia_crom = [0] * tam_poblacion  # Se guardan los totales de energia de todos los cromosomas
-array_poblacion = [0] * tam_poblacion  # Se guardan todos los cromosomas
+array_energia_crom = [0] * tam_poblacion    # Se guardan los totales de energia de todos los cromosomas
+array_poblacion = [0] * tam_poblacion       # Se guardan todos los cromosomas
 array_energia_molino = [0] * tam_poblacion  # Se guarda la energia producida por cada molino
-array_fitness = [0] * tam_poblacion
+array_fitness = [0] * tam_poblacion         # Se guarda el fitness de cada cromosoma
 
 
 class Molino:
@@ -135,17 +135,19 @@ def poblacion_inicial():
         array_poblacion[i] = m
 
 
-def balance_molinos():
+def borrar_molinos_extra():
     for i in range(tam_poblacion):
         cromosoma = array_poblacion[i]
-        cantidad_molinos = np.count_nonzero(cromosoma)
+        cantidad_molinos_actual = np.count_nonzero(cromosoma)
 
-        while cantidad_molinos > 25:
+        while cantidad_molinos_actual > cant_molinos:
             calcula_energia_cromosoma(i)
 
             energia_cromosoma = np.asarray(array_energia_molino[i])
 
+            # Se "achata" la matriz para poder el minimo valor
             arr_flat = energia_cromosoma.flatten()
+
             min_value = np.min(arr_flat[np.nonzero(arr_flat)])
 
             coord = np.where(energia_cromosoma == min_value)
@@ -158,7 +160,7 @@ def balance_molinos():
             cromosoma[x][y] = 0
             array_poblacion[i] = cromosoma
 
-            cantidad_molinos -= 1
+            cantidad_molinos_actual -= 1
 
 
 def crossover():
@@ -167,41 +169,38 @@ def crossover():
 
         if cros < chances_crossover:
 
-            #                               -- CROSSOVER POR COLUMNAS --
+            #                               -- CROSSOVER POR COLUMNAS (Hijo 1)--
             # Matriz 20x10 molinos
-            hijo1_molinos = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=1)
+            padres_concat_columnas = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=1)
             # Matriz 20x10 potencia
             hijo1_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i + 1]), axis=1)
 
             sumatoria_h1 = hijo1_potencia.sum(axis=0)  # Devuelve un arreglo con la sumatoria de todas las columnas
             permutacion = np.argsort(-sumatoria_h1)
+            
+            # Reordena las columnas segun la sumaoria de potencias (sumatoria_h1)
+            hijo1_concat_columnas = padres_concat_columnas[:, permutacion]
+            # Elimina las columnas sobrantes
+            hijo1 = hijo1_concat_columnas[:, :columnas]
 
-            """hijo1 = hijo1[:, permutacion]
-            hijo2 = hijo1[permutacion]"""
-
-            hijo1 = np.zeros((filas, columnas))
-            for columna in range(columnas):
-                for fila in range(filas):
-                    hijo1[fila][columna] = hijo1_molinos[fila][permutacion[columna]]
-
-            #                                 -- CROSSOVER POR FILAS --
+            #                                 -- CROSSOVER POR FILAS (Hijo 2)--
             # Matriz 10x20 molinos
-            hijo2_molinos = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=0)
+            padres_concat_filas = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=0)
             # Matriz 10x20 potencia
             hijo2_potencia = np.concatenate((array_energia_molino[i], array_energia_molino[i + 1]), axis=0)
 
             sumatoria_h2 = hijo2_potencia.sum(axis=1)  # Devuelve un arreglo con la sumatoria de todas las filas
             permutacion = np.argsort(-sumatoria_h2)
 
-            hijo2 = np.zeros((filas, columnas))
-            for fila in range(filas):
-                for columna in range(columnas):
-                    hijo2[fila][columna] = hijo2_molinos[permutacion[fila]][columna]
+            # Reordena las filas segun la sumaoria de potencias (sumatoria_h1)
+            hijo2_concat_columnas = padres_concat_filas[permutacion]
+            # Elimina las filas sobrantes
+            hijo2 = hijo2_concat_columnas[:filas, :]
 
             array_poblacion[i] = hijo1
             array_poblacion[i + 1] = hijo2
-    #                                          -- BORRA MOLINOS SI HAY MAS DE 25--
-    balance_molinos()
+    #            -- BORRA MOLINOS SOBRANTES (> cant_molinos)--
+    borrar_molinos_extra()
 
 
 poblacion_inicial()
