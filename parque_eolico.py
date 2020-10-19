@@ -124,11 +124,11 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
 
 def poblacion_inicial():
     for i in range(tam_poblacion):
-        m = np.zeros((10, 10))
+        m = np.zeros((filas, columnas))
         cont = 0
         while cont < 25:
-            x = random.randint(0, 9)
-            y = random.randint(0, 9)
+            x = random.randint(0, filas - 1)
+            y = random.randint(0, columnas - 1)
             if m[x][y] == 0:
                 m[x][y] = 1
                 cont = cont + 1
