@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+corridas = 25
 tam_poblacion = 50
 rugosidad = 0.0024
 chances_crossover = 2
@@ -9,13 +10,18 @@ filas = 10
 columnas = 10
 cte_long_estela = 12  # Podemos jugar con este valor
 cant_molinos = 25
-viento_puro = 10
-viento = [0] * 10
+viento_puro = 25
+porc_elitismo = 0.1
 
-array_energia_crom = [0] * tam_poblacion    # Se guardan los totales de energia de todos los cromosomas
-array_poblacion = [0] * tam_poblacion       # Se guardan todos los cromosomas
+tam_elitismo = int(tam_poblacion * porc_elitismo)
+tam_elitismo = tam_elitismo if tam_elitismo % 2 == 0 else tam_elitismo + 1
+
+viento = [0] * 10
+cromosoma_mvp = [0] * 2
+array_energia_crom = [0] * tam_poblacion  # Se guardan los totales de energia de todos los cromosomas
+array_poblacion = [0] * tam_poblacion  # Se guardan todos los cromosomas
 array_energia_molino = [0] * tam_poblacion  # Se guarda la energia producida por cada molino
-array_fitness = [0] * tam_poblacion         # Se guarda el fitness de cada cromosoma
+array_fitness = [0] * tam_poblacion  # Se guarda el fitness de cada cromosoma
 
 
 class Molino:
@@ -53,23 +59,33 @@ molinos = Molino("GAMESA G47", 55, 47, viento)
 
 
 def ruleta():
+    global array_poblacion
+    aux_poblacion = array_poblacion
     base = 0
     cant_casilleros = 0
+    tam_nueva_poblacion = len(array_poblacion)
+    if tam_nueva_poblacion < tam_poblacion:
+        for elitistas in range(len(array_elite)):
+            array_poblacion.append(array_elite[elitistas])
 
     for i in range(tam_poblacion):
-        casilleros = round(array_energia_crom[i] * 100)
+        casilleros = round(array_fitness[i] * 1000)
         cant_casilleros = cant_casilleros + casilleros
     roulette = [0] * cant_casilleros
 
     for i in range(tam_poblacion):
-        casilleros = round(array_energia_crom[i] * 100)
+        casilleros = round(array_fitness[i] * 1000)
 
         for j in range(base, base + casilleros):
             roulette[j] = i
         base = base + casilleros
 
-    bolilla = random.randint(0, cant_casilleros - 1)
-    return roulette[bolilla]
+    nueva_poblacion = [0] * tam_nueva_poblacion
+    for i in range(tam_nueva_poblacion):
+        bolilla = random.randint(0, cant_casilleros - 1)
+        nueva_poblacion[i] = aux_poblacion[roulette[bolilla]]
+
+    return nueva_poblacion
 
 
 def retorna_energia(velocidad):
@@ -116,15 +132,18 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
                     cont += 1
 
     array_energia_molino[ind_crom] = m_energia
-    array_energia_crom[ind_crom] = energia
+    return energia
 
 
-# def fitness():
+def fitness():
+    energia_total_pob = np.sum(array_energia_crom)
+    for i in range(tam_poblacion):
+        array_fitness[i] = array_energia_crom[i] / energia_total_pob
 
 
 def poblacion_inicial():
     for i in range(tam_poblacion):
-        m = np.zeros((filas, columnas))
+        m = np.zeros((filas, columnas), dtype=int)
         cont = 0
         while cont < 25:
             x = random.randint(0, filas - 1)
@@ -136,7 +155,8 @@ def poblacion_inicial():
 
 
 def borrar_molinos_extra():
-    for i in range(tam_poblacion):
+    borrar_corridas = len(array_poblacion)
+    for i in range(borrar_corridas):
         cromosoma = array_poblacion[i]
         cantidad_molinos_actual = np.count_nonzero(cromosoma)
 
@@ -164,11 +184,11 @@ def borrar_molinos_extra():
 
 
 def crossover():
-    for i in range(0, tam_poblacion, 2):
+    cros_corridas = len(array_poblacion)
+    for i in range(0, cros_corridas, 2):
         cros = random.random()
 
         if cros < chances_crossover:
-
             #                               -- CROSSOVER POR COLUMNAS (Hijo 1)--
             # Matriz 20x10 molinos
             padres_concat_columnas = np.concatenate((array_poblacion[i], array_poblacion[i + 1]), axis=1)
@@ -177,7 +197,7 @@ def crossover():
 
             sumatoria_h1 = hijo1_potencia.sum(axis=0)  # Devuelve un arreglo con la sumatoria de todas las columnas
             permutacion = np.argsort(-sumatoria_h1)
-            
+
             # Reordena las columnas segun la sumaoria de potencias (sumatoria_h1)
             hijo1_concat_columnas = padres_concat_columnas[:, permutacion]
             # Elimina las columnas sobrantes
@@ -203,10 +223,63 @@ def crossover():
     borrar_molinos_extra()
 
 
+def mutacion():
+    muta_corridas = len(array_poblacion)
+    for i in range(muta_corridas):
+        muta = random.random()
+        if muta < chances_mutacion:
+            x1 = random.randint(0, filas - 1)
+            y1 = random.randint(0, columnas - 1)
+            x2 = random.randint(0, filas - 1)
+            y2 = random.randint(0, columnas - 1)
+            while array_poblacion[i][x1][y1] != 1:
+                x1 = random.randint(0, filas - 1)
+                y1 = random.randint(0, columnas - 1)
+            while array_poblacion[i][x2][y2] != 0:
+                x2 = random.randint(0, filas - 1)
+                y2 = random.randint(0, columnas - 1)
+            array_poblacion[i][x1][y1] = 0
+            array_poblacion[i][x2][y2] = 1
+
+
+def elite():
+    global array_poblacion
+    array_elitismo = [0] * tam_elitismo
+    # Devuelve los indices de los mejores cromosomas, considerando el fitness, de mayor a menor
+    indices_elitismo = np.argsort(array_fitness)[::-1][:tam_elitismo]
+    for i in range(tam_elitismo):
+        array_elitismo[i] = array_poblacion[indices_elitismo[i]]
+    array_poblacion = np.delete(array_poblacion, indices_elitismo, 0).tolist()
+    return array_elitismo
+
+
+def asigna_mvp():
+    global cromosoma_mvp
+
+    indice_mvp = np.argmax(array_energia_crom)
+    if cromosoma_mvp[1] < array_energia_crom[indice_mvp]:
+        cromosoma_mvp[0] = array_poblacion[indice_mvp]
+        cromosoma_mvp[1] = array_energia_crom[indice_mvp]
+
+
+# resp = input('Quiere hacer elitismo (s/n): ')
+resp = 's'
 poblacion_inicial()
-for k in range(tam_poblacion):
-    calcula_energia_cromosoma(k)
-crossover()
-for k in range(tam_poblacion):
-    # print(array_poblacion[k])
-    print(array_energia_crom[k])
+cromosoma_mvp[1] = 0
+for cor in range(corridas):
+    for k in range(tam_poblacion):
+        array_energia_crom[k] = calcula_energia_cromosoma(k)
+    fitness()
+    if resp == 's' or resp == 'S':
+        array_elite = elite()
+    crossover()
+    mutacion()
+    array_poblacion = ruleta()
+    if resp == 's' or resp == 'S':
+        for eli in range(len(array_elite)):
+            array_poblacion.append(array_elite[eli])
+    array_poblacion = np.random.permutation(array_poblacion).tolist()
+    asigna_mvp()
+for dou in range(filas):
+    print(cromosoma_mvp[0][dou])
+print(cromosoma_mvp[1])
