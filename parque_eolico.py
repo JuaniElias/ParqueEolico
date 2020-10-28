@@ -1,8 +1,10 @@
 import numpy as np
 import random
+import matplotlib.pyplot as plt
+from matplotlib import colors
 
-corridas = 25
-tam_poblacion = 50
+corridas = 30
+tam_poblacion = 100
 rugosidad = 0.0024
 chances_crossover = 2
 chances_mutacion = 0.20
@@ -10,7 +12,7 @@ filas = 10
 columnas = 10
 cte_long_estela = 12  # Podemos jugar con este valor
 cant_molinos = 25
-viento_puro = 25
+viento_puro = 15
 porc_elitismo = 0.1
 
 tam_elitismo = int(tam_poblacion * porc_elitismo)
@@ -22,6 +24,9 @@ array_energia_crom = [0] * tam_poblacion  # Se guardan los totales de energia de
 array_poblacion = [0] * tam_poblacion  # Se guardan todos los cromosomas
 array_energia_molino = [0] * tam_poblacion  # Se guarda la energia producida por cada molino
 array_fitness = [0] * tam_poblacion  # Se guarda el fitness de cada cromosoma
+array_minimos = [0] * corridas
+array_maximos = [0] * corridas
+array_promedios = [0] * corridas
 
 
 class Molino:
@@ -117,19 +122,21 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
 
             if m[i][j] == 1:  # Si hay un molino en la posición
                 # Entra si el viento es puro
-                if flag or cte_long_estela * molinos.diametro < cont * molinos.distancia_minima:
+                if flag or cte_long_estela * molinos.diametro <= cont * molinos.distancia_minima:
                     flag = False
                     energia = energia + retorna_energia(viento_puro)
                     m_energia[i][j] = retorna_energia(viento_puro)
+                    velocidad_anterior = viento_puro
+                    cont = 1
                 # Entra si el viento es turbulento
                 else:
-                    velocidad_final = calcula_velocidad_viento(viento_puro, cont)
+                    velocidad_final = calcula_velocidad_viento(velocidad_anterior, cont)
+                    velocidad_anterior = velocidad_final
                     energia = energia + retorna_energia(velocidad_final)
                     m_energia[i][j] = retorna_energia(velocidad_final)
-                cont += 1
+                    cont = 1
             else:
-                if cont != 0:
-                    cont += 1
+                cont += 1
 
     array_energia_molino[ind_crom] = m_energia
     return energia
@@ -262,11 +269,44 @@ def asigna_mvp():
         cromosoma_mvp[1] = array_energia_crom[indice_mvp]
 
 
+def mayor_menor_promedio():
+    global mayor
+    global menor
+    global promedio
+
+    for i in range(tam_poblacion):
+        energia = calcula_energia_cromosoma(i)
+        promedio += energia
+        if energia > mayor:
+            mayor = energia
+
+        if energia < menor:
+            menor = energia
+
+
+def mostrar_grafica():
+    plt.plot(grafica, array_maximos, 'r-', label='Maximo')
+    plt.plot(grafica, array_minimos, 'b-', label='Minimo')
+    plt.plot(grafica, array_promedios, 'g-', label='Promedio')
+    plt.xlabel('Corridas')
+    plt.ylabel('Distancia', multialignment='center')
+    plt.legend()
+    plt.show()
+
+
 # resp = input('Quiere hacer elitismo (s/n): ')
+
 resp = 's'
+grafica = np.linspace(0, corridas, corridas)
+
 poblacion_inicial()
 cromosoma_mvp[1] = 0
 for cor in range(corridas):
+
+    mayor = 0
+    menor = 40000
+    promedio = 0
+
     for k in range(tam_poblacion):
         array_energia_crom[k] = calcula_energia_cromosoma(k)
     fitness()
@@ -278,8 +318,31 @@ for cor in range(corridas):
     if resp == 's' or resp == 'S':
         for eli in range(len(array_elite)):
             array_poblacion.append(array_elite[eli])
+
     array_poblacion = np.random.permutation(array_poblacion).tolist()
+
     asigna_mvp()
+    mayor_menor_promedio()
+
+    array_maximos[cor] = mayor
+    array_minimos[cor] = menor
+    array_promedios[cor] = promedio / tam_poblacion
+
 for dou in range(filas):
     print(cromosoma_mvp[0][dou])
+
+for k in range(tam_poblacion):
+    array_energia_crom[k] = calcula_energia_cromosoma(k)
+fitness()
+
 print(cromosoma_mvp[1])
+
+
+mostrar_grafica()
+
+colormap = colors.ListedColormap(["#90E577", "grey"])
+plt.figure(figsize=(5, 5))
+plt.imshow(cromosoma_mvp[0], cmap=colormap)
+plt.axis('off')
+plt.show()
+
