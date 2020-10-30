@@ -30,11 +30,10 @@ array_promedios = [0] * corridas
 
 
 class Molino:
-    def __init__(self, modelo, altura, diametro, velocidad_potencia):
+    def __init__(self, modelo, altura, diametro):
         self.modelo = modelo
         self.altura = altura
         self.diametro = diametro
-        self.velocidad_potencia = velocidad_potencia
         self.distancia_minima = 2 * diametro
         self.arrastre = 1 / (2 * np.log(altura / rugosidad))
         self.induccion_axial = 1 / 3
@@ -47,20 +46,7 @@ class Viento:
         self.potencia = potencia
 
 
-molinos = Molino("GAMESA G47", 55, 47, 660)
-
-viento[0] = Viento(4, 0)
-viento[1] = Viento(5, 53)
-viento[2] = Viento(6, 106)
-viento[3] = Viento(7, 166)
-viento[4] = Viento(8, 252)
-viento[5] = Viento(9, 350)
-viento[6] = Viento(10, 464)
-viento[7] = Viento(11, 560)
-viento[8] = Viento(12, 630)
-viento[9] = Viento(25, 660)
-
-molinos = Molino("GAMESA G47", 55, 47, viento)
+molinos = Molino("GAMESA G47", 55, 47)
 
 
 def ruleta():
@@ -93,15 +79,25 @@ def ruleta():
     return nueva_poblacion
 
 
-def retorna_energia(velocidad):
-    velocidad = round(velocidad)
-    for i in range(filas):
-        if velocidad == molinos.velocidad_potencia[i].velocidad:
-            return molinos.velocidad_potencia[i].potencia
-    if 13 <= velocidad <= 25:
-        return molinos.velocidad_potencia[9].potencia
-    elif velocidad > 25 or 0 <= velocidad < 4:
-        return molinos.velocidad_potencia[0].potencia
+def retorna_energia(vel_viento):
+    # region Constantes
+    a = 21.9836777975935
+    b = 4.25803634217095
+    c = 598.888997473194
+    d = 687.348053493969
+    m = 40402603.2299475
+    # endregion
+
+    if vel_viento < 5 or vel_viento > 25:
+        pot_generada = 0
+
+    elif 13 <= vel_viento <= 25:
+        pot_generada = 660
+
+    else:
+        pot_generada = d + (a - d) / (1 + (vel_viento / c) ** b) ** m
+
+    return pot_generada
 
 
 def calcula_velocidad_viento(velocidad_inicial, x):
@@ -345,4 +341,3 @@ plt.figure(figsize=(5, 5))
 plt.imshow(cromosoma_mvp[0], cmap=colormap)
 plt.axis('off')
 plt.show()
-
