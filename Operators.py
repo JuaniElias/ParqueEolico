@@ -128,7 +128,6 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
                 # Entra si el viento es puro
                 if flag or P.cte_long_estela * V.molinos.diametro <= cont * V.molinos.distancia_minima:
                     flag = False
-                    energia = energia + retorna_energia(P.viento_puro)
                     m_energia[i][j] = retorna_energia(P.viento_puro)
                     velocidad_anterior = P.viento_puro
                     cont = 1
@@ -136,13 +135,14 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
                 else:
                     velocidad_final = calcula_velocidad_viento(velocidad_anterior, cont)
                     velocidad_anterior = velocidad_final
-                    energia = energia + retorna_energia(velocidad_final)
                     m_energia[i][j] = retorna_energia(velocidad_final)
-                    cont = 1
+                    if m_energia[i][j] != 0:
+                        cont = 1
             else:
                 cont += 1
 
     V.array_energia_molino[ind_crom] = m_energia
+    energia = np.sum(m_energia)
     return energia
 
 

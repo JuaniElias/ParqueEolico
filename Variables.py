@@ -2,7 +2,7 @@ import Parameters as P
 import Models as M
 
 viento = [0] * 10
-cromosoma_mvp = [0] * 2
+cromosoma_mvp = [0] * 4
 array_energia_crom = [0] * P.tam_poblacion  # Se guardan los totales de energia de todos los cromosomas
 array_poblacion = [0] * P.tam_poblacion  # Se guardan todos los cromosomas
 array_energia_molino = [0] * P.tam_poblacion  # Se guarda la energia producida por cada molino
