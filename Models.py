@@ -1,6 +1,7 @@
 import Parameters as P
 import numpy as np
 
+
 class Molino:
     def __init__(self, modelo, altura, diametro, velocidad_potencia):
         self.modelo = modelo
@@ -12,10 +13,12 @@ class Molino:
         self.induccion_axial = 1 / 3
         self.radio_estela = 2 * diametro  # diametro/2 * 4 (valor maximo de gama), preguntar
 
+
 class Viento:
     def __init__(self, velocidad, potencia):
         self.velocidad = velocidad
         self.potencia = potencia
+
 
 class Terreno:
     def __init__(self, altitud, rugosidad, angulo_inclinacion_promedio):

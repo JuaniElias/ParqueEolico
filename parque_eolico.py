@@ -23,6 +23,9 @@ for cor in range(P.corridas):
     V.menor = 40000
     V.promedio = 0
 
+    if cor != 0:
+        P.chances_mutacion = P.chances_mutacion ** cor
+
     for k in range(P.tam_poblacion):
         V.array_energia_crom[k] = O.calcula_energia_cromosoma(k)
     O.fitness()
@@ -44,8 +47,8 @@ for cor in range(P.corridas):
     V.array_minimos[cor] = V.menor
     V.array_promedios[cor] = V.promedio / P.tam_poblacion
 
-for dou in range(P.filas):
-    print(V.cromosoma_mvp[0][dou])
+for f in range(P.filas):
+    print(V.cromosoma_mvp[0][f])
 
 for k in range(P.tam_poblacion):
     V.array_energia_crom[k] = O.calcula_energia_cromosoma(k)

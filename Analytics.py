@@ -4,6 +4,7 @@ import Operators as O
 import numpy as np
 import matplotlib.pyplot as plt
 
+
 def asigna_mvp():
     indice_mvp = np.argmax(V.array_energia_crom)
     if V.cromosoma_mvp[1] < V.array_energia_crom[indice_mvp]:
@@ -12,7 +13,6 @@ def asigna_mvp():
 
 
 def mayor_menor_promedio():
-
     for i in range(P.tam_poblacion):
         energia = O.calcula_energia_cromosoma(i)
         V.promedio += energia

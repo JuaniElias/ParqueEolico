@@ -4,6 +4,7 @@ import Variables as V
 import numpy as np
 import random
 
+
 def poblacion_inicial():
     for i in range(P.tam_poblacion):
         m = np.zeros((P.filas, P.columnas), dtype=int)
@@ -170,7 +171,6 @@ def ruleta():
     return nueva_poblacion
 
 
-
 def mutacion():
     muta_corridas = len(V.array_poblacion)
     for i in range(muta_corridas):
@@ -198,5 +198,3 @@ def elite():
         array_elitismo[i] = V.array_poblacion[indices_elitismo[i]]
     V.array_poblacion = np.delete(V.array_poblacion, indices_elitismo, 0).tolist()
     return array_elitismo
-
-
