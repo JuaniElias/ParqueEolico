@@ -26,8 +26,7 @@ for cor in range(P.corridas):
     P.chances_mutacion = (C.const_mutacion / P.corridas) * (cor + 1) + C.mutacion_inicial
     P.chances_crossover = -(C.const_crossover / P.corridas) * (cor + 1) + C.crossover_inicial
 
-    for k in range(P.tam_poblacion):
-        V.array_energia_crom[k] = O.calcula_energia_cromosoma(k)
+    O.calcula_energia_poblacion()
     O.fitness()
     if resp == 's' or resp == 'S':
         V.array_elite = O.elite()

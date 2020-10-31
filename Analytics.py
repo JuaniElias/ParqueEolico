@@ -6,17 +6,17 @@ import matplotlib.pyplot as plt
 
 
 def asigna_mvp():
-    indice_mvp = np.argmax(V.array_energia_crom)
-    if V.cromosoma_mvp[1] <= V.array_energia_crom[indice_mvp]:
+    indice_mvp = np.argmax(V.array_fitness)
+    if V.cromosoma_mvp[1] <= np.sum(V.array_energia_molino[indice_mvp]):
         V.cromosoma_mvp[0] = V.array_poblacion[indice_mvp]
-        V.cromosoma_mvp[1] = V.array_energia_crom[indice_mvp]
+        V.cromosoma_mvp[1] = np.sum(V.array_energia_molino[indice_mvp])
         V.cromosoma_mvp[2] = V.array_energia_molino[indice_mvp]
         V.cromosoma_mvp[3] = indice_mvp
 
 
 def mayor_menor_promedio():
     for i in range(P.tam_poblacion):
-        energia = O.calcula_energia_cromosoma(i)
+        energia = np.sum(V.array_energia_molino[i])
         V.promedio += energia
         if energia > V.mayor:
             V.mayor = energia

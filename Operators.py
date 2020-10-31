@@ -65,7 +65,7 @@ def borrar_molinos_extra():
         cantidad_molinos_actual = np.count_nonzero(cromosoma)
 
         while cantidad_molinos_actual > P.cant_molinos:
-            calcula_energia_cromosoma(i)
+            V.array_energia_molino[i] = calcula_energia_cromosoma(cromosoma)
 
             energia_cromosoma = np.asarray(V.array_energia_molino[i])
 
@@ -114,17 +114,17 @@ def calcula_velocidad_viento(velocidad_inicial, x):
     return velocidad_final
 
 
-def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
-    energia = 0
+def calcula_energia_cromosoma(cromosoma):  # Pensar para 3 molinos consecutivos
+
     m_energia = np.zeros((P.filas, P.columnas))
-    m = V.array_poblacion[ind_crom]
+
     # Def matriz de vientos que me arme un 10x10 con todos los valores del viento
     for i in range(P.filas):
         flag = True
         cont = 0
         for j in range(P.columnas):
 
-            if m[i][j] == 1:  # Si hay un molino en la posición
+            if cromosoma[i][j] == 1:  # Si hay un molino en la posición
                 # Entra si el viento es puro
                 if flag or P.cte_long_estela * V.molinos.diametro <= cont * V.molinos.distancia_minima:
                     flag = False
@@ -141,15 +141,23 @@ def calcula_energia_cromosoma(ind_crom):  # Pensar para 3 molinos consecutivos
             else:
                 cont += 1
 
-    V.array_energia_molino[ind_crom] = m_energia
-    energia = np.sum(m_energia)
-    return energia
+    return m_energia
 
+def calcula_energia_poblacion():
+    for i in range(P.tam_poblacion):
+        crom = V.array_poblacion[i]
+        V.array_energia_molino[i] = calcula_energia_cromosoma(crom)
+        #V.array_energia_crom[i] = np.sum(V.array_energia_molino[i])
 
 def fitness():
-    energia_total_pob = np.sum(V.array_energia_crom)
+    energia_total_pob = 0
     for i in range(P.tam_poblacion):
-        V.array_fitness[i] = V.array_energia_crom[i] / energia_total_pob
+        energia_total_pob += np.sum(V.array_energia_molino[i])
+    #energia_total_pob = np.sum(V.array_energia_crom)
+    """for i in range(P.tam_poblacion):
+        V.array_fitness[i] = V.array_energia_crom[i] / energia_total_pob"""
+    for i in range(P.tam_poblacion):
+        V.array_fitness[i] = np.sum(V.array_energia_molino[i]) / energia_total_pob
 
 
 def ruleta():
