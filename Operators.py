@@ -87,15 +87,25 @@ def borrar_molinos_extra():
             cantidad_molinos_actual -= 1
 
 
-def retorna_energia(velocidad):
-    velocidad = round(velocidad)
-    for i in range(P.filas):
-        if velocidad == V.molinos.velocidad_potencia[i].velocidad:
-            return V.molinos.velocidad_potencia[i].potencia
-    if 13 <= velocidad <= 25:
-        return V.molinos.velocidad_potencia[9].potencia
-    elif velocidad > 25 or 0 <= velocidad < 4:
-        return V.molinos.velocidad_potencia[0].potencia
+def retorna_energia(vel_viento):
+    # region Constantes
+    a = 21.9836777975935
+    b = 4.25803634217095
+    c = 598.888997473194
+    d = 687.348053493969
+    m = 40402603.2299475
+    # endregion
+
+    if vel_viento < 5 or vel_viento > 25:
+        pot_generada = 0
+
+    elif 13 <= vel_viento <= 25:
+        pot_generada = 660
+
+    else:
+        pot_generada = d + (a - d) / (1 + (vel_viento / c) ** b) ** m
+
+    return pot_generada
 
 
 def calcula_velocidad_viento(velocidad_inicial, x):
