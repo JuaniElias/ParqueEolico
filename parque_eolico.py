@@ -64,4 +64,3 @@ plt.figure(figsize=(5, 5))
 plt.imshow(V.cromosoma_mvp[0], cmap=colormap)
 plt.axis('off')
 plt.show()
-
