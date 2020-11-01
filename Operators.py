@@ -143,19 +143,17 @@ def calcula_energia_cromosoma(cromosoma):  # Pensar para 3 molinos consecutivos
 
     return m_energia
 
+
 def calcula_energia_poblacion():
     for i in range(P.tam_poblacion):
         crom = V.array_poblacion[i]
         V.array_energia_molino[i] = calcula_energia_cromosoma(crom)
-        #V.array_energia_crom[i] = np.sum(V.array_energia_molino[i])
+
 
 def fitness():
     energia_total_pob = 0
     for i in range(P.tam_poblacion):
         energia_total_pob += np.sum(V.array_energia_molino[i])
-    #energia_total_pob = np.sum(V.array_energia_crom)
-    """for i in range(P.tam_poblacion):
-        V.array_fitness[i] = V.array_energia_crom[i] / energia_total_pob"""
     for i in range(P.tam_poblacion):
         V.array_fitness[i] = np.sum(V.array_energia_molino[i]) / energia_total_pob
 
