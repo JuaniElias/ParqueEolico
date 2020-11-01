@@ -17,3 +17,5 @@ promedio = 0
 array_elite = [0] * P.tam_elitismo
 molinos = M.Molino("GAMESA G47", 55, 47)
 
+
+
