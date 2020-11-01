@@ -1,7 +1,7 @@
 corridas = 50
 tam_poblacion = 50
-chances_crossover = 0.8
-chances_mutacion = 0.5
+chances_crossover = 0.80
+chances_mutacion = 0.05
 porc_elitismo = 0.1
 cte_long_estela = 12  # Podemos jugar con este valor
 cant_molinos = 25
