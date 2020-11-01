@@ -60,7 +60,15 @@ print(V.cromosoma_mvp[1])
 A.mostrar_grafica(grafica)
 
 colormap = colors.ListedColormap(["#90E577", "grey"])
-plt.figure(figsize=(5, 5))
-plt.imshow(V.cromosoma_mvp[0], cmap=colormap)
-plt.axis('off')
+im = plt.imread('images/arrow_wind.png')
+
+f, axarr = plt.subplots(1, 2)
+
+axarr[0].axis("off")
+axarr[1].axis("off")
+axarr[0].imshow(im)
+axarr[1].grid(which='minor', color='black', linestyle='-', linewidth=2)
+axarr[1].imshow(V.cromosoma_mvp[0], cmap=colormap)
+
+plt.title("Mejor disposicion de molinos", size=16)
 plt.show()
