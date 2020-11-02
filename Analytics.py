@@ -54,7 +54,7 @@ def mostrar_grilla():
 
     titulo = str(round(V.cromosoma_mvp[1], 2))
 
-    plt.title("Esta distribución de molinos produce " + titulo + " kW de energía", size=18)
+    plt.title("Esta distribución de molinos produce " + titulo + " kW de energía", size=16)
     plt.grid(b=True, color='#666666', linestyle='-')
 
     axarr[1].set_xticks(np.arange(-.5, 10, 1))

@@ -39,25 +39,23 @@ for cor in range(P.corridas):
 
     O.calcula_energia_poblacion()
 
-    A.mayor_menor_promedio(cor)
+    #A.mayor_menor_promedio(cor)
 
     A.asigna_mvp(cor)
 
-    # V.array_poblacion = np.random.permutation(V.array_poblacion).tolist()
+    #V.array_poblacion = np.random.permutation(V.array_poblacion).tolist()
 
-for f in range(P.filas):
+"""for f in range(P.filas):
     print(V.cromosoma_mvp[0][f])
-
-print()
 
 for f in range(P.filas):
     print(V.cromosoma_mvp[2][f])
 
 print(round(V.cromosoma_mvp[1], 2))
 
-print(V.cromosoma_mvp[3])
+print(V.cromosoma_mvp[3])"""
 
-A.mostrar_grafica(grafica)
+#A.mostrar_grafica(grafica)
 
 A.mostrar_grilla()
 
