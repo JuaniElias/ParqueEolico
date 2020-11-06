@@ -5,7 +5,7 @@ chances_mutacion = 0.05
 porc_elitismo = 0.1
 cte_long_estela = 12  # Podemos jugar con este valor
 cant_molinos = 25
-viento_puro = 20
+viento_puro = 14
 
 # Parametros del Terreno
 rugosidad = 0.0024

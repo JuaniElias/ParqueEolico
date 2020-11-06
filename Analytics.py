@@ -57,11 +57,11 @@ def mostrar_grilla():
     plt.title("Esta distribución de molinos produce " + titulo + " kW de energía", size=16)
     plt.grid(b=True, color='#666666', linestyle='-')
 
-    axarr[1].set_xticks(np.arange(-.5, 10, 1))
-    axarr[1].set_yticks(np.arange(-.5, 10, 1))
+    axarr[1].set_xticks(np.arange(-.5, P.columnas, 1))
+    axarr[1].set_yticks(np.arange(-.5, P.filas, 1))
 
-    axarr[1].set_xticklabels(np.arange(0, 11, 1))
-    axarr[1].set_yticklabels(np.arange(0, 11, 1))
+    axarr[1].set_xticklabels(np.arange(0, P.columnas+1, 1))
+    axarr[1].set_yticklabels(np.arange(0, P.filas+1, 1))
 
     axarr[1].xaxis.tick_top()
 
